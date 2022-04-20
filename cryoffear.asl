@@ -24,12 +24,14 @@ init
     vars.maps=0;
     vars.chapters=0;
     vars.savetime=0;
-    vars.saveflag=0;
+    
     
 }
 
 startup
 {
+    vars.crashtime=0;
+    vars.saveflag=0;
     vars.campaign=0;
     vars.TimerModel = new TimerModel { CurrentState = timer };
     settings.Add("Split when entering the level");
@@ -77,7 +79,11 @@ split
     {
         if((old.map!=current.map
         &&current.map!="c_trainscene.bsp"
-        &&current.map!="c_broscene.bsp")
+        &&current.map!="c_broscene.bsp"
+        &&current.map!="c_game_menu1.bsp"
+        &&old.map!="c_game_menu1.bsp")
+        &&current.map!="c_game_menu1.bsp"//
+        &&current.map!=""//
         &&vars.flag==1
         ||(current.music=="endmusic1.mp3")//main campaign the worst ending
         ||(current.music=="endmusic2.mp3")//main campaign bad ending
@@ -137,17 +143,18 @@ split
 
 gameTime
 {
+
     if (old.savestate!=0 && current.savestate==0&&current.music=="Saved")
     {
         vars.maps=0;
         vars.savemap=current.map;
         vars.saveflag=1;
         vars.savetime=timer.CurrentTime.GameTime.Value.TotalSeconds;
+        vars.crashtime=vars.savetime;
     }   
     
-    if((current.menu_map=="c_loadgame.bsp"&&current.loadingstate!=0||current.alive==0)&&vars.saveflag==1)
+    if((current.menu_map=="c_loadgame.bsp"&&current.loadingstate!=0||current.alive==0||current.map==""&&current.loadingstate==0||current.map=="c_game_menu1.bsp")&&vars.saveflag==1)
     {   
-
         if(settings["Split when entering the level"])
         {
             vars.flag=1;
@@ -180,8 +187,15 @@ gameTime
                     vars.chapters=0;   
                 }
     }   
-          
-        return TimeSpan.FromSeconds((vars.savetime));
+        if(vars.savetime==0)
+        {
+            return TimeSpan.FromSeconds((vars.crashtime));
+        }
+        else
+        {
+            return TimeSpan.FromSeconds((vars.savetime));
+        }  
+        
     }
 
 }
