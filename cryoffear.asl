@@ -9,12 +9,13 @@ state("cof")
     float igt: "client.dll",0x1BE920;
     string40 music : "client.dll",0x5440C8;
     string40 ambient : "hw.dll",0x72F11B;
-    float savestate: "client.dll", 0x18D1DC;
+    float savestate: "client.dll", 0x18A3E0;
     float hp: "hw.dll",0x116BED0;
     float canmove: "hw.dll",0x9FDC30;
     float alive: "hw.dll", 0x1F39F0;
     float demo: "hw.dll", 0x1F39C8;
     int typeofgame: "combase.dll",0x23EB70;
+    float crashstate: "crashhandler.dll",0x5600C;
 }
 
 init
@@ -85,6 +86,7 @@ split
         &&current.map!="c_game_menu1.bsp"//
         &&current.map!=""//
         &&vars.flag==1
+       // &&(current.crashstate!=0&&old.crashstate==0)
         ||(current.music=="endmusic1.mp3")//main campaign the worst ending
         ||(current.music=="endmusic2.mp3")//main campaign bad ending
         ||(current.music=="endmusic3.mp3")//main campaign bad ending
@@ -143,7 +145,13 @@ split
 
 gameTime
 {
-
+    // if(current.crashstate!=0&&old.crashstate==0)
+    // {
+    //     vars.TimerModel.UndoSplit();
+    // }
+    print("time:" + vars.savetime.ToString());
+    print("crash:" + vars.crashtime.ToString());
+    print("save:" + vars.saveflag.ToString());
     if (old.savestate!=0 && current.savestate==0&&current.music=="Saved")
     {
         vars.maps=0;
@@ -153,7 +161,7 @@ gameTime
         vars.crashtime=vars.savetime;
     }   
     
-    if((current.menu_map=="c_loadgame.bsp"&&current.loadingstate!=0||current.alive==0||current.map==""&&current.loadingstate==0||current.map=="c_game_menu1.bsp")&&vars.saveflag==1)
+    if((current.menu_map=="c_loadgame.bsp"&&current.loadingstate!=0||current.alive==0||current.map==""&&current.loadingstate==0||current.map=="c_game_menu1.bsp")||(current.crashstate!=0&&old.crashstate==0)&&vars.saveflag==1)
     {   
         if(settings["Split when entering the level"])
         {
