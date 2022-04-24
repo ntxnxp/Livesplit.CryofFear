@@ -145,13 +145,7 @@ split
 
 gameTime
 {
-    // if(current.crashstate!=0&&old.crashstate==0)
-    // {
-    //     vars.TimerModel.UndoSplit();
-    // }
-    print("time:" + vars.savetime.ToString());
-    print("crash:" + vars.crashtime.ToString());
-    print("save:" + vars.saveflag.ToString());
+
     if (old.savestate!=0 && current.savestate==0&&current.music=="Saved")
     {
         vars.maps=0;
