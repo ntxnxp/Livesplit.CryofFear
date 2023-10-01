@@ -1,3 +1,4 @@
+//v1.1
 state("cof")
 {
     float pausestate: "hw.dll",0x11119E4;
@@ -57,7 +58,7 @@ start
 reset
 {
 
-    return ((current.map=="c_nightmare.bsp"||current.map=="c_doc_city.bsp")&&old.igt!=0&&current.igt==0)||current.music=="Starting in 3 seconds";
+    return ((current.map=="c_nightmare.bsp"||current.map=="c_doc_city.bsp")&&old.igt!=0&&current.igt==0)||current.music=="Starting in 3 seconds"||current.map=="c_intro.bsp";//added condition for reset (current.map=="c_intro.bsp")
 
 }
 
@@ -74,17 +75,26 @@ isLoading
     ||(current.alive==0&&current.typeofgame==4072));
 }
 
-split
+split//added more conditions for splitting
 {
     if(settings["Split when entering the level"])
     {
         if((old.map!=current.map
         &&current.map!="c_trainscene.bsp"
         &&current.map!="c_broscene.bsp"
+		&&current.map!="c_intro.bsp"//new
         &&current.map!="c_game_menu1.bsp"
-        &&old.map!="c_game_menu1.bsp")
-        &&current.map!="c_game_menu1.bsp"//
-        &&current.map!=""//
+		&&current.map!="cof_campaign_01.bsp"//new
+		&&current.map!="c_difficulty_settings.bsp"//new
+		&&current.map!="c_loadgame.bsp"//new
+		&&current.map!=""//new
+		&&old.map!="c_intro.bsp"//new
+        &&old.map!="c_game_menu1.bsp"
+		&&old.map!="c_difficulty_settings.bsp"//new
+		&&old.map!="c_loadgame.bsp"//new
+		&&old.map!=""//new
+		&&current.map!="c_nightmare.bsp"//new
+		&&current.map!="c_doc_city.bsp")//new
         &&vars.flag==1
        // &&(current.crashstate!=0&&old.crashstate==0)
         ||(current.music=="endmusic1.mp3")//main campaign the worst ending
