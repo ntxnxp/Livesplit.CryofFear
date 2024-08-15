@@ -1,4 +1,4 @@
-//v1.1
+//v1.2
 state("cof")
 {
     float pausestate: "hw.dll",0x11119E4;
@@ -25,7 +25,7 @@ init
     vars.savemap = "";
     vars.maps=0;
     vars.chapters=0;
-    vars.savetime=0;
+    //vars.savetime=0;
     
     
 }
@@ -161,7 +161,7 @@ gameTime
         vars.maps=0;
         vars.savemap=current.map;
         vars.saveflag=1;
-        vars.savetime=timer.CurrentTime.GameTime.Value.TotalSeconds;
+        //vars.savetime=timer.CurrentTime.GameTime.Value.TotalSeconds;
         vars.crashtime=vars.savetime;
     }   
     
@@ -199,14 +199,14 @@ gameTime
                     vars.chapters=0;   
                 }
     }   
-        if(vars.savetime==0)
-        {
-            return TimeSpan.FromSeconds((vars.crashtime));
-        }
-        else
-        {
-            return TimeSpan.FromSeconds((vars.savetime));
-        }  
+        //if(vars.savetime==0)
+        //{
+        //    return TimeSpan.FromSeconds((vars.crashtime));
+        //}
+        //else
+        //{
+        //    return TimeSpan.FromSeconds((vars.savetime));
+        //}  
         
     }
 
