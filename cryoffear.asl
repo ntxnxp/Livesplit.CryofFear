@@ -1,4 +1,5 @@
-//v1.2
+
+
 state("cof")
 {
     float pausestate: "hw.dll",0x11119E4;
@@ -10,13 +11,12 @@ state("cof")
     float igt: "client.dll",0x1BE920;
     string40 music : "client.dll",0x5440C8;
     string40 ambient : "hw.dll",0x72F11B;
-    float savestate: "client.dll", 0x18A3E0;
+    float savestate: "client.dll", 0x18D1DC;
     float hp: "hw.dll",0x116BED0;
     float canmove: "hw.dll",0x9FDC30;
-    float alive: "hw.dll", 0x1F39F0;
+    float alive: "hw.dll", 0x1F39F0;//client.dll 18CB58
+    float alivecoop: "hw.dll", 0x798BFC;
     float demo: "hw.dll", 0x1F39C8;
-    int typeofgame: "combase.dll",0x23EB70;
-    float crashstate: "crashhandler.dll",0x5600C;
 }
 
 init
@@ -25,16 +25,12 @@ init
     vars.savemap = "";
     vars.maps=0;
     vars.chapters=0;
-    //vars.savetime=0;
-    
-    
+    vars.savetime=0;
+    vars.saveflag=0;
 }
 
 startup
 {
-    vars.crashtime=0;
-    vars.saveflag=0;
-    vars.campaign=0;
     vars.TimerModel = new TimerModel { CurrentState = timer };
     settings.Add("Split when entering the level");
     settings.SetToolTip("Split when entering the level",
@@ -46,25 +42,46 @@ startup
 
 start
 {
-
-    if((current.map=="c_nightmare.bsp" && current.loadingstate==0)
+    vars.saveflag=0;
+    return (current.map=="c_nightmare.bsp" && current.loadingstate==0)
     ||(current.map=="c_doc_city.bsp" && current.loadingstate==0)
-    ||(current.music=="coopstart.mp3"))  
-    {
-        return true;
-    }
+    ||(current.map=="c_rumpel1.bsp" && current.loadingstate==0 && current.cutscenestate == 0)
+    ||(current.map=="c_hallo_iambulletproof.bsp" && current.loadingstate==0 && current.cutscenestate == 0)
+    ||(current.map=="c_arvuti.bsp" && current.loadingstate==0 && current.cutscenestate == 0)
+    ||(current.map=="c_the_stairway1.bsp" && current.loadingstate==0)
+    ||(current.coopstart=="coopstart.mp3");
 }
 
 reset
 {
-
-    return ((current.map=="c_nightmare.bsp"||current.map=="c_doc_city.bsp")&&old.igt!=0&&current.igt==0)||current.music=="Starting in 3 seconds"||current.map=="c_intro.bsp";//added condition for reset (current.map=="c_intro.bsp")
-
+    if(current.demo==0)
+    {
+        return current.map=="c_nightmare.bsp"
+        |current.map=="c_doc_city.bsp"
+        |current.map=="c_rumpel1.bsp"
+        |current.map=="c_hallo_iambulletproof.bsp"
+        |current.map=="c_arvuti.bsp"
+        |current.map=="c_the_stairway1.bsp"
+        |current.map=="cof_campaign_01.bsp"
+        |current.map=="cof_manhunt_campaign.bsp"
+        &&old.igt!=0&&current.igt==0;
+    }
+    // return current.map=="c_nightmare.bsp"
+    // |current.map=="c_doc_city.bsp"
+    // |current.map=="c_rumpel1.bsp"
+    // |current.map=="c_hallo_iambulletproof.bsp"
+    // |current.map=="c_arvuti.bsp"
+    // |current.map=="c_the_stairway1.bsp"
+    // |current.map=="cof_campaign_01.bsp"
+    // |current.map=="cof_manhunt_campaign.bsp"
+    // &&old.igt!=0&&current.igt==0
+    // &&current.demo!=0;
 }
 
 isLoading
-{                       
-    return ((current.pausestate !=0)||(current.loadingstate ==0)
+{    
+                         
+    return (current.pausestate !=0)||(current.loadingstate ==0)
     ||(current.cutscenestate !=0&&current.canmove==0)
     ||(current.cutscenestate !=0&&current.map=="c_subway2st3.bsp")//for some reason you gain control during the cutscene
     ||(current.cutscenestate !=0&&current.map=="c_trainscene.bsp")//for some reason you gain control during the cutscene
@@ -72,37 +89,27 @@ isLoading
     ||(current.menu_map=="c_loadgame.bsp"&&current.loadingstate ==0)
     ||(current.menu_map=="c_difficulty_settings.bsp")
     ||(current.menu_map=="c_game_menu1.bsp")
-    ||(current.alive==0&&current.typeofgame==4072));
+    ||(current.alivecoop!=0)
+    ||(current.alive==0);
 }
 
-split//added more conditions for splitting
+split
 {
     if(settings["Split when entering the level"])
     {
         if((old.map!=current.map
         &&current.map!="c_trainscene.bsp"
-        &&current.map!="c_broscene.bsp"
-		&&current.map!="c_intro.bsp"//new
-        &&current.map!="c_game_menu1.bsp"
-		&&current.map!="cof_campaign_01.bsp"//new
-		&&current.map!="c_difficulty_settings.bsp"//new
-		&&current.map!="c_loadgame.bsp"//new
-		&&current.map!=""//new
-		&&old.map!="c_intro.bsp"//new
-        &&old.map!="c_game_menu1.bsp"
-		&&old.map!="c_difficulty_settings.bsp"//new
-		&&old.map!="c_loadgame.bsp"//new
-		&&old.map!=""//new
-		&&current.map!="c_nightmare.bsp"//new
-		&&current.map!="c_doc_city.bsp")//new
+        &&current.map!="c_broscene.bsp")
         &&vars.flag==1
-       // &&(current.crashstate!=0&&old.crashstate==0)
         ||(current.music=="endmusic1.mp3")//main campaign the worst ending
         ||(current.music=="endmusic2.mp3")//main campaign bad ending
         ||(current.music=="endmusic3.mp3")//main campaign bad ending
         ||(current.music=="endmusic4.mp3")//main campaign good ending
         ||(current.music=="coopend.mp3")//coop
         ||(current.music=="manhunt.mp3")//manhunt
+        ||(current.music=="lifelover.mp3")//memories
+        ||(current.music=="survive_hotel_terror.mp3")//halloween
+        ||(current.music=="collab_csong.mp3")//community
         ||(current.map=="c_doc_ending.bsp"))//docmode
         {
             if(vars.saveflag==1&&vars.flag==1)
@@ -155,18 +162,17 @@ split//added more conditions for splitting
 
 gameTime
 {
-
     if (old.savestate!=0 && current.savestate==0&&current.music=="Saved")
     {
         vars.maps=0;
         vars.savemap=current.map;
         vars.saveflag=1;
-        //vars.savetime=timer.CurrentTime.GameTime.Value.TotalSeconds;
-        vars.crashtime=vars.savetime;
+        vars.savetime=timer.CurrentTime.GameTime.Value.TotalSeconds;
     }   
     
-    if((current.menu_map=="c_loadgame.bsp"&&current.loadingstate!=0||current.alive==0||current.map==""&&current.loadingstate==0||current.map=="c_game_menu1.bsp")||(current.crashstate!=0&&old.crashstate==0)&&vars.saveflag==1)
+    if((current.menu_map=="c_loadgame.bsp"&&current.loadingstate!=0||current.alive==0)&&vars.saveflag==1)
     {   
+
         if(settings["Split when entering the level"])
         {
             vars.flag=1;
@@ -199,15 +205,8 @@ gameTime
                     vars.chapters=0;   
                 }
     }   
-        //if(vars.savetime==0)
-        //{
-        //    return TimeSpan.FromSeconds((vars.crashtime));
-        //}
-        //else
-        //{
-        //    return TimeSpan.FromSeconds((vars.savetime));
-        //}  
-        
+          
+        return TimeSpan.FromSeconds((vars.savetime));
     }
 
 }
